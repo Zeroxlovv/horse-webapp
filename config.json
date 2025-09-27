@@ -1,0 +1,10 @@
+{
+    "bot_username": "your_bot_username",
+    "webapp_url": "https://zeroxlovv.github.io/horse-webapp/",
+    "allowed_domains": ["https://zeroxlovv.github.io"],
+    "features": {
+        "web_app": true,
+        "inline_mode": false,
+        "payments": false
+    }
+}
