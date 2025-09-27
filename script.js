@@ -1,5 +1,3 @@
-// Дополнительная логика для веб-приложения
-
 class HorseCareApp {
     constructor() {
         this.tg = window.Telegram.WebApp;
@@ -11,28 +9,10 @@ class HorseCareApp {
     init() {
         this.tg.expand();
         this.tg.enableClosingConfirmation();
-        this.bindEvents();
-        this.loadData();
+        this.loadUserData();
     }
 
-    bindEvents() {
-        // Обработка изменения размера окна
-        this.tg.onEvent('viewportChanged', this.handleViewportChange.bind(this));
-        
-        // Обработка закрытия
-        this.tg.onEvent('beforeUnload', this.handleBeforeUnload.bind(this));
-    }
-
-    handleViewportChange() {
-        this.tg.expand();
-    }
-
-    handleBeforeUnload() {
-        // Сохранение данных перед закрытием
-        this.saveState();
-    }
-
-    async loadData() {
+    async loadUserData() {
         try {
             this.showLoading();
             
@@ -45,44 +25,53 @@ class HorseCareApp {
             
         } catch (error) {
             console.error('Error loading data:', error);
-            this.showError('Ошибка загрузки данных');
+            this.showError('Ошибка загрузки данных. Убедитесь, что вы открыли приложение через бота.');
         }
     }
 
-    processIncomingData(data) {
+    processMessage(text) {
         try {
-            const parsedData = JSON.parse(data);
-            
-            if (parsedData.user) {
-                this.userData = parsedData.user;
-                this.displayUserInfo();
+            if (text.startsWith('Данные для веб-приложения: ')) {
+                const jsonStr = text.replace('Данные для веб-приложения: ', '');
+                const data = JSON.parse(jsonStr);
+                this.displayData(data);
             }
-            
-            if (parsedData.horses) {
-                this.horses = parsedData.horses;
-                this.displayHorses();
-            }
-            
-            this.hideLoading();
-            
         } catch (error) {
-            console.error('Error parsing data:', error);
-            this.showError('Ошибка обработки данных');
+            console.error('Error processing message:', error);
+        }
+    }
+
+    displayData(data) {
+        try {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (data && data.user) {
+                this.userData = data.user;
+                this.horses = data.horses || [];
+                this.displayUserInfo();
+                this.displayHorses();
+            } else {
+                this.showError('Неверный формат данных');
+            }
+        } catch (error) {
+            console.error('Error displaying data:', error);
+            this.showError('Ошибка отображения данных');
         }
     }
 
     displayUserInfo() {
         if (!this.userData) return;
 
-        const userInfoEl = document.getElementById('userInfo');
-        if (userInfoEl) {
-            userInfoEl.innerHTML = `
-                <h3>👤 Информация о пользователе</h3>
+        const userDetails = document.getElementById('userDetails');
+        const userInfo = document.getElementById('userInfo');
+        
+        if (userDetails && userInfo) {
+            userDetails.innerHTML = `
                 <p><strong>Имя:</strong> ${this.userData.username || 'Не указано'}</p>
                 <p><strong>Пол:</strong> ${this.userData.gender === 'муж' ? 'Мужской' : 'Женский'}</p>
                 <p><strong>Чибик:</strong> ${this.userData.chibik_name}</p>
             `;
-            userInfoEl.style.display = 'block';
+            userInfo.style.display = 'block';
         }
     }
 
@@ -102,9 +91,6 @@ class HorseCareApp {
             <div class="no-horses">
                 <h3>🐎 У вас пока нет коней</h3>
                 <p>Добавьте первого коня через меню бота!</p>
-                <button class="btn btn-submit" onclick="this.tg.openTelegramLink('https://t.me/your_bot_username')">
-                    📱 Открыть бота
-                </button>
             </div>
         `;
     }
@@ -180,10 +166,10 @@ class HorseCareApp {
             };
             
             this.tg.sendData(JSON.stringify(data));
-            this.showSuccess(successMessage);
+            this.showNotification(successMessage);
             
             // Обновляем данные через секунду
-            setTimeout(() => this.loadData(), 1000);
+            setTimeout(() => this.loadUserData(), 1000);
             
         } catch (error) {
             console.error('Error updating stats:', error);
@@ -192,73 +178,42 @@ class HorseCareApp {
     }
 
     async deleteHorse(horseId) {
-        this.tg.showConfirm('Вы уверены, что хотите удалить этого коня?', (confirmed) => {
-            if (confirmed) {
+        if (confirm('Вы уверены, что хотите удалить этого коня?')) {
+            try {
                 const data = {
                     action: 'delete_horse_request',
                     horse_id: horseId
                 };
                 
                 this.tg.sendData(JSON.stringify(data));
-                this.showSuccess('Заявка на удаление отправлена администратору');
+                this.showNotification('Заявка на удаление отправлена администратору!');
                 
-                setTimeout(() => this.loadData(), 1000);
+                setTimeout(() => this.loadUserData(), 1000);
+                
+            } catch (error) {
+                console.error('Error deleting horse:', error);
+                this.showError('Ошибка отправки заявки');
             }
-        });
+        }
     }
 
     showLoading() {
-        const container = document.getElementById('horsesList');
-        container.innerHTML = '<div class="loading">Загрузка данных...</div>';
-    }
-
-    hideLoading() {
-        // Автоматически скрывается при отображении данных
-    }
-
-    showSuccess(message) {
-        this.tg.showPopup({
-            title: 'Успех!',
-            message: message,
-            buttons: [{ type: 'ok' }]
-        });
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('horsesList').innerHTML = '';
+        document.getElementById('userInfo').style.display = 'none';
     }
 
     showError(message) {
-        this.tg.showPopup({
-            title: 'Ошибка',
-            message: message,
-            buttons: [{ type: 'ok' }]
-        });
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
     }
 
-    saveState() {
-        // Сохранение состояния в localStorage
-        const state = {
-            userData: this.userData,
-            horses: this.horses,
-            timestamp: Date.now()
-        };
-        localStorage.setItem('horseCareState', JSON.stringify(state));
-    }
-
-    loadState() {
-        // Загрузка состояния из localStorage
-        const saved = localStorage.getItem('horseCareState');
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                // Используем сохраненные данные только если им меньше 5 минут
-                if (Date.now() - state.timestamp < 5 * 60 * 1000) {
-                    this.userData = state.userData;
-                    this.horses = state.horses;
-                    this.displayUserInfo();
-                    this.displayHorses();
-                }
-            } catch (error) {
-                console.error('Error loading saved state:', error);
-            }
-        }
+    showNotification(message) {
+        // В реальном приложении лучше использовать toast уведомления
+        alert(message);
     }
 }
 
@@ -267,12 +222,11 @@ let app;
 
 document.addEventListener('DOMContentLoaded', () => {
     app = new HorseCareApp();
-    app.loadState(); // Загружаем сохраненное состояние
 });
 
-// Глобальная функция для обработки данных от бота
-window.handleTelegramData = function(data) {
+// Глобальная функция для обработки сообщений от бота
+window.handleBotMessage = function(text) {
     if (app) {
-        app.processIncomingData(data);
+        app.processMessage(text);
     }
 };
