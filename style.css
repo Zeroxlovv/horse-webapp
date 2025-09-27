@@ -231,3 +231,23 @@ body {
     background: #5a6fd8;
     transform: translateY(-2px);
 }
+.refresh-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-refresh {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-refresh:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
