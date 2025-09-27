@@ -9,10 +9,11 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
+    color: #333;
 }
 
 .container {
-    max-width: 400px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -42,7 +43,6 @@ body {
     margin-bottom: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     position: relative;
-    overflow: hidden;
 }
 
 .horse-card::before {
@@ -134,6 +134,9 @@ body {
     text-align: center;
     color: white;
     padding: 40px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    margin: 20px 0;
 }
 
 .loading {
@@ -153,19 +156,38 @@ body {
     display: none;
 }
 
-.add-horse-section {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
+.actions-section {
+    display: flex;
+    gap: 10px;
     margin-top: 20px;
-    text-align: center;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.btn-secondary {
+    background: #f44336;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    flex: 1;
 }
 
 .horse-name {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 5px;
-    color: #333;
 }
 
 .horse-number {
@@ -181,7 +203,6 @@ body {
     margin-top: 10px;
 }
 
-/* Адаптивность */
 @media (max-width: 480px) {
     .container {
         padding: 10px;
@@ -198,56 +219,8 @@ body {
     .actions {
         grid-template-columns: 1fr;
     }
-}
-
-/* Анимации */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.btn:active {
-    animation: pulse 0.3s ease;
-}
-
-.actions-section {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.btn-primary {
-    background: #667eea;
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    background: #5a6fd8;
-    transform: translateY(-2px);
-}
-.refresh-section {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.btn-refresh {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-refresh:hover {
-    background: #45a049;
-    transform: translateY(-2px);
+    
+    .actions-section {
+        flex-direction: column;
+    }
 }
