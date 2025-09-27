@@ -210,3 +210,24 @@ body {
 .btn:active {
     animation: pulse 0.3s ease;
 }
+
+.actions-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
