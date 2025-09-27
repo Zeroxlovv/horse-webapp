@@ -30,16 +30,45 @@ class HorseCareApp {
     }
 
     processMessage(text) {
-        try {
-            if (text.startsWith('Данные для веб-приложения: ')) {
-                const jsonStr = text.replace('Данные для веб-приложения: ', '');
+    try {
+        console.log("Received message:", text);
+        
+        if (text.startsWith('Данные для веб-приложения: ')) {
+            const jsonStr = text.replace('Данные для веб-приложения: ', '');
+            console.log("JSON string:", jsonStr);
+            
+            // Проверяем валидность JSON
+            try {
                 const data = JSON.parse(jsonStr);
                 this.displayData(data);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                
+                // Попробуем починить JSON (убрать лишние символы)
+                const cleanedJson = jsonStr
+                    .replace(/,\s*}/g, '}')  // Убираем запятые перед }
+                    .replace(/,\s*]/g, ']')  // Убираем запятые перед ]
+                    .replace(/;\s*/g, ',')   // Заменяем точки с запятой на запятые
+                    .replace(/"\s*}/g, '"}') // Убираем пробелы перед }
+                    .replace(/"\s*]/g, '"]') // Убираем пробелы перед ]
+                    .replace(/\\"/g, '"')    // Убираем экранированные кавычки
+                    .replace(/\s+/g, ' ');   // Убираем лишние пробелы
+                
+                console.log("Cleaned JSON:", cleanedJson);
+                
+                try {
+                    const data = JSON.parse(cleanedJson);
+                    this.displayData(data);
+                } catch (secondError) {
+                    this.showError('Ошибка парсинга JSON: ' + secondError.message);
+                }
             }
-        } catch (error) {
-            console.error('Error processing message:', error);
         }
+    } catch (error) {
+        console.error('Error processing message:', error);
+        this.showError('Ошибка обработки данных: ' + error.message);
     }
+}
 
     displayData(data) {
         try {
