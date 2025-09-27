@@ -7,33 +7,35 @@ class HorseCareApp {
     }
 
     init() {
-        console.log("Инициализация приложения...");
-        this.tg.expand();
-        this.tg.enableClosingConfirmation();
+        console.log("Инициализация HorseCareApp...");
         
-        // Проверяем, открыто ли приложение через Telegram
+        // Проверяем, запущено ли в Telegram Web App
         if (this.tg.initDataUnsafe.user) {
-            console.log("Приложение открыто через Telegram");
+            console.log("Запущено в Telegram Web App");
+            this.tg.expand();
+            this.tg.enableClosingConfirmation();
+            this.tg.ready();
+            
+            // Загружаем данные при запуске
             this.loadUserData();
         } else {
-            console.log("Приложение открыто в браузере, а не через Telegram");
-            this.showError("Откройте приложение через Telegram бота для работы с данными");
+            console.log("Запущено в браузере");
+            this.showError("Это приложение предназначено для использования в Telegram. Откройте его через бота.");
         }
     }
 
     async loadUserData() {
         try {
             this.showLoading();
-            console.log("Запрос данных у бота...");
+            console.log("Запрашиваем данные у бота...");
             
-            const data = {
+            const requestData = {
                 action: 'get_user_data',
                 timestamp: Date.now()
             };
             
             // Отправляем запрос боту
-            this.tg.sendData(JSON.stringify(data));
-            console.log("Данные отправлены боту");
+            this.tg.sendData(JSON.stringify(requestData));
             
         } catch (error) {
             console.error('Ошибка загрузки данных:', error);
@@ -41,23 +43,26 @@ class HorseCareApp {
         }
     }
 
-    // Эта функция будет вызываться когда бот ответит
-    processBotResponse(text) {
+    // Обработка сообщений от бота
+    processBotMessage(messageText) {
         try {
-            console.log("Получен ответ от бота:", text);
+            console.log("Получено сообщение от бота:", messageText);
             
-            if (text && text.startsWith('Данные для веб-приложения: ')) {
-                const jsonStr = text.replace('Данные для веб-приложения: ', '');
-                console.log("JSON данные:", jsonStr);
+            if (messageText.startsWith('Данные для веб-приложения: ')) {
+                const jsonStr = messageText.replace('Данные для веб-приложения: ', '');
+                console.log("Данные JSON:", jsonStr);
                 
-                const data = JSON.parse(jsonStr);
-                this.displayData(data);
-            } else {
-                this.showError("Неверный формат ответа от бота");
+                const response = JSON.parse(jsonStr);
+                
+                if (response.type === 'user_data') {
+                    this.displayData(response.data);
+                } else {
+                    this.showError('Неизвестный тип ответа от бота');
+                }
             }
         } catch (error) {
-            console.error('Ошибка обработки данных:', error);
-            this.showError('Ошибка обработки данных: ' + error.message);
+            console.error('Ошибка обработки сообщения:', error);
+            this.showError('Ошибка обработки данных от бота: ' + error.message);
         }
     }
 
@@ -66,7 +71,7 @@ class HorseCareApp {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             
-            console.log("Отображение данных:", data);
+            console.log("Отображаем данные:", data);
             
             if (data && data.user) {
                 this.userData = data.user;
@@ -74,11 +79,11 @@ class HorseCareApp {
                 this.displayUserInfo();
                 this.displayHorses();
             } else {
-                this.showError('Неверный формат данных');
+                this.showError('Неверный формат данных от бота');
             }
         } catch (error) {
             console.error('Ошибка отображения данных:', error);
-            this.showError('Ошибка отображения данных');
+            this.showError('Ошибка отображения данных: ' + error.message);
         }
     }
 
@@ -113,7 +118,7 @@ class HorseCareApp {
         return `
             <div class="no-horses">
                 <h3>🐎 У вас пока нет коней</h3>
-                <p>Добавьте первого коня через меню бота!</p>
+                <p>Добавьте первого коня через основное меню бота!</p>
             </div>
         `;
     }
@@ -125,10 +130,10 @@ class HorseCareApp {
 
         return `
             <div class="horse-card">
-                ${horse.photo ? `<img src="${horse.photo}" alt="${horse.name}" class="horse-photo">` : ''}
+                ${horse.photo ? `<img src="${horse.photo}" alt="${horse.name}" class="horse-photo" onerror="this.style.display='none'">` : ''}
                 
-                <div class="horse-name">${horse.name}</div>
-                <div class="horse-number">№${horse.number}</div>
+                <div class="horse-name">${this.escapeHtml(horse.name)}</div>
+                <div class="horse-number">№${this.escapeHtml(horse.number)}</div>
                 
                 <div class="stats">
                     <div class="stat">
@@ -164,6 +169,12 @@ class HorseCareApp {
                 </div>
             </div>
         `;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     async feedHorse(horseId) {
@@ -233,6 +244,7 @@ class HorseCareApp {
     }
 
     showNotification(message) {
+        // В реальном приложении лучше использовать toast
         alert(message);
     }
 }
@@ -246,13 +258,14 @@ function loadUserData() {
     }
 }
 
+// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     app = new HorseCareApp();
 });
 
 // Функция для обработки сообщений от бота (если нужно)
-window.handleBotMessage = function(text) {
+window.handleBotMessage = function(messageText) {
     if (app) {
-        app.processBotResponse(text);
+        app.processBotMessage(messageText);
     }
 };
