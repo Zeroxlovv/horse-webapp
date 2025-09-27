@@ -30,33 +30,12 @@
             color: white;
         }
 
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .user-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
         .horse-card {
             background: white;
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .horse-photo {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 15px;
         }
 
         .stats {
@@ -115,10 +94,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
         .no-horses {
             text-align: center;
             color: white;
@@ -131,37 +106,13 @@
             font-size: 18px;
         }
 
-        .add-horse-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .btn-submit {
-            background: #667eea;
-            color: white;
-            width: 100%;
+        .error {
+            background: #ffebee;
+            color: #c62828;
             padding: 15px;
-            font-size: 16px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
         }
     </style>
 </head>
@@ -172,184 +123,201 @@
             <p>Заботься о своих питомцах!</p>
         </div>
 
-        <div id="userInfo" class="user-card" style="display: none;">
-            <h3>👤 Информация о пользователе</h3>
-            <p id="userName"></p>
-            <p id="userGender"></p>
-            <p id="chibikName"></p>
-        </div>
+        <div id="loading" class="loading">Загрузка данных...</div>
+        
+        <div id="error" class="error" style="display: none;"></div>
 
         <div id="horsesList"></div>
-
-        <div class="add-horse-section">
-            <h3>➕ Добавить нового коня</h3>
-            <p>Чтобы добавить коня, используйте кнопку "Добавить коня" в основном меню бота</p>
-        </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
+        class HorseCareApp {
+            constructor() {
+                this.tg = window.Telegram.WebApp;
+                this.userData = null;
+                this.horses = [];
+                this.init();
+            }
 
-        let userData = null;
-        let horses = [];
+            init() {
+                this.tg.expand();
+                this.tg.enableClosingConfirmation();
+                this.loadDataFromURL();
+            }
 
-        async function loadUserData() {
-            try {
-                const data = {
-                    action: 'get_user_data'
-                };
+            loadDataFromURL() {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const dataParam = urlParams.get('data');
+                    
+                    if (dataParam) {
+                        const data = JSON.parse(decodeURIComponent(dataParam));
+                        this.processData(data);
+                    } else {
+                        this.requestDataFromBot();
+                    }
+                } catch (error) {
+                    console.error('Error loading data from URL:', error);
+                    this.requestDataFromBot();
+                }
+            }
+
+            requestDataFromBot() {
+                try {
+                    const data = {
+                        action: 'get_user_data',
+                        timestamp: Date.now()
+                    };
+                    
+                    this.tg.sendData(JSON.stringify(data));
+                    this.showError('Данные запрошены у бота. Закройте и откройте приложение через кнопку "Обновить данные"');
+                    
+                } catch (error) {
+                    console.error('Error requesting data:', error);
+                    this.showError('Ошибка запроса данных. Убедитесь, что вы используете приложение через Telegram бота.');
+                }
+            }
+
+            processData(data) {
+                try {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data && data.user) {
+                        this.userData = data.user;
+                        this.horses = data.horses || [];
+                        this.displayHorses();
+                    } else {
+                        this.showError('Неверный формат данных');
+                    }
+                } catch (error) {
+                    console.error('Error processing data:', error);
+                    this.showError('Ошибка обработки данных');
+                }
+            }
+
+            displayHorses() {
+                const container = document.getElementById('horsesList');
                 
-                tg.sendData(JSON.stringify(data));
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showError('Ошибка загрузки данных');
-            }
-        }
+                if (!this.horses || this.horses.length === 0) {
+                    container.innerHTML = this.getNoHorsesHTML();
+                    return;
+                }
 
-        function displayUserInfo(user) {
-            if (user) {
-                document.getElementById('userName').textContent = `Имя: ${user.username || 'Не указано'}`;
-                document.getElementById('userGender').textContent = `Пол: ${user.gender === 'муж' ? 'Мужской' : 'Женский'}`;
-                document.getElementById('chibikName').textContent = `Чибик: ${user.chibik_name}`;
-                document.getElementById('userInfo').style.display = 'block';
+                container.innerHTML = this.horses.map(horse => this.getHorseHTML(horse)).join('');
             }
-        }
 
-        function displayHorses(horsesList) {
-            const container = document.getElementById('horsesList');
-            
-            if (!horsesList || horsesList.length === 0) {
-                container.innerHTML = `
+            getNoHorsesHTML() {
+                return `
                     <div class="no-horses">
                         <h3>🐎 У вас пока нет коней</h3>
                         <p>Добавьте первого коня через меню бота!</p>
                     </div>
                 `;
-                return;
             }
 
-            container.innerHTML = horsesList.map(horse => `
-                <div class="horse-card">
-                    ${horse.photo ? `<img src="${horse.photo}" alt="${horse.name}" class="horse-photo">` : ''}
-                    <h3>${horse.name} (#${horse.number})</h3>
-                    
-                    <div class="stats">
-                        <div class="stat">
-                            <div>🍗 Корм</div>
-                            <div>${horse.feed_level}%</div>
-                            <div class="stat-bar">
-                                <div class="stat-fill feed-fill" style="width: ${horse.feed_level}%"></div>
+            getHorseHTML(horse) {
+                return `
+                    <div class="horse-card">
+                        <h3>${horse.name} (#${horse.number})</h3>
+                        
+                        <div class="stats">
+                            <div class="stat">
+                                <div>🍗 Корм</div>
+                                <div>${horse.feed_level}%</div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill feed-fill" style="width: ${horse.feed_level}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat">
+                                <div>💧 Вода</div>
+                                <div>${horse.water_level}%</div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill water-fill" style="width: ${horse.water_level}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat">
+                                <div>🌱 Цветы</div>
+                                <div>${horse.flower_level}%</div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill flower-fill" style="width: ${horse.flower_level}%"></div>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="stat">
-                            <div>💧 Вода</div>
-                            <div>${horse.water_level}%</div>
-                            <div class="stat-bar">
-                                <div class="stat-fill water-fill" style="width: ${horse.water_level}%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat">
-                            <div>🌱 Цветы</div>
-                            <div>${horse.flower_level}%</div>
-                            <div class="stat-bar">
-                                <div class="stat-fill flower-fill" style="width: ${horse.flower_level}%"></div>
-                            </div>
+                        <div class="actions">
+                            <button class="btn btn-feed" onclick="app.feedHorse(${horse.id})">🍗 +10</button>
+                            <button class="btn btn-water" onclick="app.waterHorse(${horse.id})">💧 +10</button>
+                            <button class="btn btn-flowers" onclick="app.flowerHorse(${horse.id})">🌱 +5</button>
+                            <button class="btn btn-delete" onclick="app.deleteHorse(${horse.id})">🗑️ Удалить</button>
                         </div>
                     </div>
-                    
-                    <div class="actions">
-                        <button class="btn btn-feed" onclick="feedHorse(${horse.id})">🍗 Покормить (+10)</button>
-                        <button class="btn btn-water" onclick="waterHorse(${horse.id})">💧 Напоить (+10)</button>
-                        <button class="btn btn-flowers" onclick="flowerHorse(${horse.id})">🌱 Полить (+5)</button>
-                        <button class="btn btn-delete" onclick="deleteHorse(${horse.id})">🗑️ Удалить коня</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+                `;
+            }
 
-        async function feedHorse(horseId) {
-            const data = {
-                action: 'update_horse_stats',
-                horse_id: horseId,
-                feed: 10
-            };
-            tg.sendData(JSON.stringify(data));
-            tg.showPopup({
-                title: 'Успех!',
-                message: 'Конь покормлен!',
-                buttons: [{ type: 'ok' }]
-            });
-            setTimeout(loadUserData, 1000);
-        }
+            async feedHorse(horseId) {
+                await this.updateHorseStats(horseId, { feed: 10 }, 'Конь покормлен!');
+            }
 
-        async function waterHorse(horseId) {
-            const data = {
-                action: 'update_horse_stats',
-                horse_id: horseId,
-                water: 10
-            };
-            tg.sendData(JSON.stringify(data));
-            tg.showPopup({
-                title: 'Успех!',
-                message: 'Конь напоен!',
-                buttons: [{ type: 'ok' }]
-            });
-            setTimeout(loadUserData, 1000);
-        }
+            async waterHorse(horseId) {
+                await this.updateHorseStats(horseId, { water: 10 }, 'Конь напоен!');
+            }
 
-        async function flowerHorse(horseId) {
-            const data = {
-                action: 'update_horse_stats',
-                horse_id: horseId,
-                flowers: 5
-            };
-            tg.sendData(JSON.stringify(data));
-            tg.showPopup({
-                title: 'Успех!',
-                message: 'Цветы политы!',
-                buttons: [{ type: 'ok' }]
-            });
-            setTimeout(loadUserData, 1000);
-        }
+            async flowerHorse(horseId) {
+                await this.updateHorseStats(horseId, { flowers: 5 }, 'Цветы политы!');
+            }
 
-        async function deleteHorse(horseId) {
-            tg.showConfirm('Вы уверены, что хотите удалить этого коня?', (confirmed) => {
-                if (confirmed) {
+            async updateHorseStats(horseId, stats, successMessage) {
+                try {
                     const data = {
-                        action: 'delete_horse_request',
-                        horse_id: horseId
+                        action: 'update_horse_stats',
+                        horse_id: horseId,
+                        ...stats
                     };
-                    tg.sendData(JSON.stringify(data));
-                    tg.showPopup({
-                        title: 'Заявка отправлена',
-                        message: 'Заявка на удаление отправлена администратору',
-                        buttons: [{ type: 'ok' }]
-                    });
-                    setTimeout(loadUserData, 1000);
+                    
+                    this.tg.sendData(JSON.stringify(data));
+                    this.showNotification(successMessage);
+                    
+                } catch (error) {
+                    console.error('Error updating stats:', error);
+                    this.showError('Ошибка обновления');
                 }
-            });
+            }
+
+            async deleteHorse(horseId) {
+                if (confirm('Вы уверены, что хотите удалить этого коня?')) {
+                    try {
+                        const data = {
+                            action: 'delete_horse_request',
+                            horse_id: horseId
+                        };
+                        
+                        this.tg.sendData(JSON.stringify(data));
+                        this.showNotification('Заявка на удаление отправлена!');
+                        
+                    } catch (error) {
+                        console.error('Error deleting horse:', error);
+                        this.showError('Ошибка отправки заявки');
+                    }
+                }
+            }
+
+            showError(message) {
+                const errorEl = document.getElementById('error');
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+
+            showNotification(message) {
+                alert(message); // В реальном приложении лучше использовать toast уведомления
+            }
         }
 
-        function showError(message) {
-            tg.showPopup({
-                title: 'Ошибка',
-                message: message,
-                buttons: [{ type: 'ok' }]
-            });
-        }
-
-        // Обработчик входящих сообщений от бота
-        tg.onEvent('viewportChanged', () => {
-            tg.expand();
-        });
-
-        // Загружаем данные при запуске
+        // Инициализация приложения
+        let app;
         document.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
+            app = new HorseCareApp();
         });
     </script>
 </body>
