@@ -19,14 +19,15 @@
         <div id="error" class="error" style="display: none;"></div>
 
         <div id="userInfo" class="user-card" style="display: none;">
-            <h3>👤 Информация о пользователе</h3>
+            <h3>👤 Ваш профиль</h3>
             <div id="userDetails"></div>
         </div>
 
         <div id="horsesList"></div>
 
-        <div class="refresh-section">
-            <button class="btn-refresh" onclick="loadUserData()">🔄 Обновить данные</button>
+        <div class="actions-section">
+            <button class="btn btn-primary" onclick="loadUserData()">🔄 Обновить данные</button>
+            <button class="btn btn-secondary" onclick="window.Telegram.WebApp.close()">❌ Закрыть</button>
         </div>
     </div>
 
