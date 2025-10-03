@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конный клуб "Герои"</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #C19A6B;
+            --secondary: #8B7355;
+            --light: #E5D3B3;
+            --dark: #2D2424;
+            --darker: #1A1616;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --text: #E0E0E0;
+            --text-light: #F5F5F5;
+            --text-muted: #B0B0B0;
+            --bg: #121212;
+            --card-bg: #1E1E1E;
+            --header-bg: #2D2424;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Навигация */
+        header {
+            background: linear-gradient(135deg, var(--header-bg), var(--darker));
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--secondary);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        nav a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+            transition: left 0.3s;
+        }
+        
+        nav a:hover::before {
+            left: 0;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        /* Основной контент */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .page {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+            border: 1px solid #333;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        h1, h2, h3 {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            position: relative;
+            font-weight: 600;
+        }
+        
+        h1::after, h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        /* Кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.7rem 1.5rem;
+            background-color: var(--primary);
+            color: var(--text-light);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: #212529;
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Формы */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #2a2a2a;
+            color: var(--text);
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.2);
+        }
+        
+        /* Карточки коней */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: var(--card-bg);
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #333;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        
+        .card-header {
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text-light);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+        
+        .card-index {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card-text {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .horse-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            gap: 0.5rem;
+        }
+        
+        .horse-stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: var(--text-light);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .stat-bar {
+            height: 4px;
+            background-color: #333;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .food-fill { background-color: var(--success); }
+        .water-fill { background-color: var(--info); }
+        .happiness-fill { background-color: var(--warning); }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        
+        /* Уведомления */
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .alert-success {
+            color: #d4edda;
+            background-color: #155724;
+            border-color: #0c3d17;
+        }
+        
+        .alert-danger {
+            color: #f8d7da;
+            background-color: #721c24;
+            border-color: #57141a;
+        }
+        
+        .alert-info {
+            color: #d1ecf1;
+            background-color: #0c5460;
+            border-color: #083038;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background-color: var(--info);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            max-width: 350px;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Админ-панель */
+        .admin-panel {
+            background-color: #252525;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .user-list, .horse-admin-list {
+            margin-top: 1.5rem;
+        }
+        
+        .user-item, .horse-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+            transition: background 0.3s;
+        }
+        
+        .user-item:hover, .horse-item:hover {
+            background-color: #2a2a2a;
+        }
+        
+        .user-item:last-child, .horse-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-info, .horse-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name, .horse-name {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .user-email, .horse-index {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .user-role {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .role-admin {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+        
+        .role-user {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: var(--info);
+        }
+        
+        /* Загрузка фото */
+        .photo-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .photo-preview {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            border: 2px dashed #555;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 10px;
+            background-color: #2a2a2a;
+        }
+        
+        .photo-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.8rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .horse-stats {
+                flex-direction: column;
+            }
+            
+            .actions {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* Дополнительные стили */
+        .welcome-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+        }
+        
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .welcome-text {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: var(--text-muted);
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+            border: 1px solid #333;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .feature-card p {
+            color: var(--text-muted);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #444;
+        }
+        
+        .admin-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .user-actions, .horse-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .admin-hint {
+            background-color: #2a2a2a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .admin-hint p {
+            color: var(--text-muted);
+        }
+        
+        .admin-hint strong {
+            color: var(--text-light);
+        }
+        
+        .join-btn-container {
+            margin-top: 1.5rem;
+        }
+
+        .real-time-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--info);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 2rem auto;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            border: 1px solid #444;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text-light);
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .modal-index {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #444;
+        }
+        
+        .modal-description {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-stat {
+            background: #252525;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        
+        .modal-stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+        
+        .modal-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        
+        .modal-action-btn {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .modal-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .feed-btn {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .water-btn {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .play-btn {
+            background-color: var(--warning);
+            color: #212529;
+        }
+        
+        .rest-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger);
+            color: white;
+            grid-column: 1 / -1;
+            margin-top: 0.5rem;
+        }
+        
+        /* Адаптивность для модального окна */
+        @media (max-width: 768px) {
+            .modal-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 1rem auto;
+            }
+        }
+
+        /* Ссылки */
+        a {
+            color: var(--primary);
+            transition: color 0.3s;
+        }
+        
+        a:hover {
+            color: var(--light);
+        }
+        
+        /* Улучшение контрастности текста */
+        p, span, div {
+            color: var(--text);
+        }
+        
+        strong {
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-horse-head"></i>
+            <span>Конный клуб "Герои"</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showPage('home')">Главная</a></li>
+                <li><a href="#" onclick="showPage('horses')">Наши кони</a></li>
+                <li id="admin-nav" style="display: none;"><a href="#" onclick="showPage('admin')">Админ-панель</a></li>
+                <li id="auth-nav">
+                    <a href="#" onclick="showPage('login')" id="login-link">Войти</a>
+                    <a href="#" onclick="showPage('register')" id="register-link" style="display: none;">Регистрация</a>
+                </li>
+                <li id="user-nav" style="display: none;">
+                    <span id="user-name" style="color: var(--light);"></span>
+                    <a href="#" onclick="logout()">Выйти</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Главная страница -->
+        <div id="home" class="page active">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Добро пожаловать в Конный клуб "Герои"</h1>
+                <p class="welcome-text">Мы заботимся о наших лошадях и предоставляем нашим гостям возможность взаимодействовать с этими великолепными животными.</p>
+                
+                <div class="join-btn-container">
+                    <button id="join-btn" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Присоединиться к нам
+                    </button>
+                </div>
+            </div>
+            
+            <h2>Почему стоит выбрать нас?</h2>
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-horse"></i>
+                    </div>
+                    <h3 class="feature-title">Уникальные кони</h3>
+                    <p>Каждый конь имеет свою уникальную историю и характер</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="feature-title">Забота о животных</h3>
+                    <p>Мы обеспечиваем лучшие условия для наших лошадей</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Сообщество</h3>
+                    <p>Присоединяйтесь к нашему дружному сообществу</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница входа -->
+        <div id="login" class="page">
+            <h2>Вход в систему</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username"><i class="fas fa-user"></i> Имя пользователя</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password"><i class="fas fa-lock"></i> Пароль</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+            <p style="margin-top: 1rem;">Нет аккаунта? <a href="#" onclick="showPage('register')">Зарегистрируйтесь</a></p>
+            <div class="admin-hint">
+                <p><strong>Для тестирования:</strong></p>
+                <p>Администратор: admin / admin123</p>
+            </div>
+        </div>
+
+        <!-- Страница регистрации -->
+        <div id="register" class="page">
+            <h2>Регистрация</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-username"><i class="fas fa-user"></i> Имя пользователя</label>
+                    <input type="text" id="register-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password"><i class="fas fa-lock"></i> Пароль</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </button>
+            </form>
+            <p style="margin-top: 1rem;">Уже есть аккаунт? <a href="#" onclick="showPage('login')">Войдите</a></p>
+        </div>
+
+        <!-- Страница с карточками коней -->
+        <div id="horses" class="page">
+            <h2>Наши кони</h2>
+            <p>Нажмите на карточку коня, чтобы увидеть подробности и взаимодействовать с ним.</p>
+            
+            <div id="horses-list" class="cards-grid">
+                <!-- Карточки коней будут добавлены динамически -->
+            </div>
+        </div>
+
+        <!-- Страница админ-панели -->
+        <div id="admin" class="page">
+            <h2>Админ-панель</h2>
+            
+            <div class="admin-panel">
+                <h3><i class="fas fa-plus-circle"></i> Добавить нового коня</h3>
+                <form id="add-horse-form">
+                    <div class="form-group">
+                        <label for="horse-name">Имя коня</label>
+                        <input type="text" id="horse-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horse-index">Индекс коня</label>
+                        <input type="text" id="horse-index" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horse-description">Описание</label>
+                        <textarea id="horse-description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="horse-photo">Загрузить фото</label>
+                        <input type="file" id="horse-photo" accept="image/*">
+                        <div class="photo-preview">
+                            <span>Предпросмотр фото</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-save"></i> Добавить коня
+                    </button>
+                </form>
+            </div>
+            
+            <div class="admin-panel">
+                <h3><i class="fas fa-users-cog"></i> Управление пользователями</h3>
+                <div id="users-list" class="user-list">
+                    <!-- Список пользователей будет добавлен динамически -->
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <h3><i class="fas fa-trash"></i> Управление конями</h3>
+                <div id="horses-admin-list" class="horse-admin-list">
+                    <!-- Список коней для удаления будет добавлен динамически -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Модальное окно для коня -->
+    <div id="horse-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeHorseModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2 class="modal-title" id="modal-horse-name"></h2>
+                <div class="modal-index" id="modal-horse-index"></div>
+            </div>
+            <div class="modal-body">
+                <img id="modal-horse-photo" src="" alt="" class="modal-image">
+                <p class="modal-description" id="modal-horse-description"></p>
+                
+                <div class="modal-stats">
+                    <div class="modal-stat">
+                        <div class="modal-stat-value" id="modal-horse-food">0%</div>
+                        <div class="modal-stat-label">Еда</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill food-fill" id="modal-horse-food-bar"></div>
+                        </div>
+                    </div>
+                    <div class="modal-stat">
+                        <div class="modal-stat-value" id="modal-horse-water">0%</div>
+                        <div class="modal-stat-label">Вода</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill water-fill" id="modal-horse-water-bar"></div>
+                        </div>
+                    </div>
+                    <div class="modal-stat">
+                        <div class="modal-stat-value" id="modal-horse-happiness">0%</div>
+                        <div class="modal-stat-label">Настроение</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill happiness-fill" id="modal-horse-happiness-bar"></div>
+                        </div>
+                    </div>
+                    <div class="modal-stat">
+                        <div class="modal-stat-value" id="modal-horse-energy">0%</div>
+                        <div class="modal-stat-label">Энергия</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill food-fill" id="modal-horse-energy-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-action-btn feed-btn" onclick="feedHorse(currentHorseId)">
+                        <i class="fas fa-carrot"></i> Покормить
+                    </button>
+                    <button class="modal-action-btn water-btn" onclick="waterHorse(currentHorseId)">
+                        <i class="fas fa-tint"></i> Напоить
+                    </button>
+                    <button class="modal-action-btn play-btn" onclick="playWithHorse(currentHorseId)">
+                        <i class="fas fa-gamepad"></i> Поиграть
+                    </button>
+                    <button class="modal-action-btn rest-btn" onclick="restHorse(currentHorseId)">
+                        <i class="fas fa-bed"></i> Отдых
+                    </button>
+                    <button class="modal-action-btn delete-btn" id="modal-delete-btn" onclick="deleteHorse(currentHorseId)" style="display: none;">
+                        <i class="fas fa-trash"></i> Удалить коня
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="real-time-indicator">
+        <i class="fas fa-circle pulse"></i>
+        <span>Режим реального времени</span>
+    </div>
+
+    <script>
+        // Главный администратор (предустановленный)
+        const mainAdmin = {
+            username: "admin",
+            password: "admin123",
+            email: "admin@horseclub.com",
+            role: "admin"
+        };
+
+        // База данных в памяти
+        let users = JSON.parse(localStorage.getItem('users')) || [mainAdmin];
+        let horses = JSON.parse(localStorage.getItem('horses')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let currentHorseId = null;
+
+        // Функция для расчета уменьшения показателей на основе прошедшего времени
+        function calculateStatsDecrease(horse) {
+            const now = new Date();
+            const lastUpdated = new Date(horse.lastUpdated);
+            const hoursPassed = (now - lastUpdated) / (1000 * 60 * 60);
+            
+            if (hoursPassed >= 2) {
+                // Вычисляем, сколько полных 2-часовых интервалов прошло
+                const intervalsPassed = Math.floor(hoursPassed / 2);
+                
+                // Уменьшаем показатели пропорционально количеству прошедших интервалов
+                horse.food = Math.max(0, horse.food - 10 * intervalsPassed);
+                horse.water = Math.max(0, horse.water - 15 * intervalsPassed);
+                horse.happiness = Math.max(0, horse.happiness - 5 * intervalsPassed);
+                horse.lastUpdated = now.toISOString();
+                
+                return true; // Показатели изменились
+            }
+            return false; // Показатели не изменились
+        }
+
+        // Функция для обновления показателей в реальном времени
+        function updateStatsInRealTime() {
+            let statsChanged = false;
+            
+            horses.forEach(horse => {
+                if (calculateStatsDecrease(horse)) {
+                    statsChanged = true;
+                    
+                    // Отправка уведомления пользователям
+                    if (horse.food < 30 || horse.water < 30 || horse.happiness < 30) {
+                        showNotification(`Показатели коня ${horse.name} снизились! Проверьте его состояние.`, 'error');
+                    }
+                }
+            });
+            
+            if (statsChanged) {
+                localStorage.setItem('horses', JSON.stringify(horses));
+                loadHorses();
+                
+                // Если модальное окно открыто, обновляем его
+                if (currentHorseId) {
+                    const horse = horses.find(h => h.id === currentHorseId);
+                    if (horse) {
+                        updateModalStats(horse);
+                    }
+                }
+            }
+        }
+
+        // Функции для работы с интерфейсом
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Если открыли админ-панель и пользователь админ, загружаем списки
+            if (pageId === 'admin' && currentUser && currentUser.role === 'admin') {
+                loadUsers();
+                loadHorsesAdmin();
+            }
+        }
+
+        function updateUI() {
+            if (currentUser) {
+                document.getElementById('login-link').style.display = 'none';
+                document.getElementById('register-link').style.display = 'none';
+                document.getElementById('user-nav').style.display = 'flex';
+                document.getElementById('user-name').textContent = currentUser.username;
+                
+                // Обновляем кнопку "Присоединиться к нам" для авторизованных пользователей
+                const joinBtn = document.getElementById('join-btn');
+                joinBtn.innerHTML = '<i class="fas fa-horse"></i> Перейти к коням';
+                joinBtn.onclick = function() { showPage('horses'); };
+                
+                if (currentUser.role === 'admin') {
+                    document.getElementById('admin-nav').style.display = 'block';
+                } else {
+                    document.getElementById('admin-nav').style.display = 'none';
+                }
+            } else {
+                document.getElementById('login-link').style.display = 'inline';
+                document.getElementById('register-link').style.display = 'inline';
+                document.getElementById('user-nav').style.display = 'none';
+                document.getElementById('admin-nav').style.display = 'none';
+                
+                // Обновляем кнопку "Присоединиться к нам" для неавторизованных пользователей
+                const joinBtn = document.getElementById('join-btn');
+                joinBtn.innerHTML = '<i class="fas fa-user-plus"></i> Присоединиться к нам';
+                joinBtn.onclick = function() { showPage('register'); };
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = 'var(--success)';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = 'var(--danger)';
+            } else {
+                notification.style.backgroundColor = 'var(--info)';
+            }
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Функция для кнопки "Присоединиться к нам"
+        function setupJoinButton() {
+            const joinBtn = document.getElementById('join-btn');
+            
+            if (currentUser) {
+                // Если пользователь уже авторизован, кнопка ведет на страницу с конями
+                joinBtn.innerHTML = '<i class="fas fa-horse"></i> Перейти к коням';
+                joinBtn.onclick = function() { showPage('horses'); };
+            } else {
+                // Если пользователь не авторизован, кнопка ведет на регистрацию
+                joinBtn.innerHTML = '<i class="fas fa-user-plus"></i> Присоединиться к нам';
+                joinBtn.onclick = function() { showPage('register'); };
+            }
+        }
+
+        // Функции для работы с пользователями
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            // Проверка, существует ли пользователь
+            if (users.find(user => user.username === username)) {
+                showNotification('Пользователь с таким именем уже существует', 'error');
+                return;
+            }
+            
+            // Добавление нового пользователя
+            const newUser = {
+                username,
+                email,
+                password,
+                role: 'user'
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showNotification('Регистрация прошла успешно! Теперь вы можете войти.', 'success');
+            showPage('login');
+            document.getElementById('register-form').reset();
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Поиск пользователя
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUI();
+                setupJoinButton();
+                showNotification(`Добро пожаловать, ${user.username}!`, 'success');
+                showPage('horses');
+                document.getElementById('login-form').reset();
+                
+                // Если пользователь - администратор, загружаем список пользователей
+                if (user.role === 'admin') {
+                    loadUsers();
+                }
+            } else {
+                showNotification('Неверное имя пользователя или пароль', 'error');
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUI();
+            setupJoinButton();
+            showNotification('Вы вышли из системы', 'success');
+            showPage('home');
+        }
+
+        // Функции для работы с лошадьми
+        function loadHorses() {
+            const horsesList = document.getElementById('horses-list');
+            horsesList.innerHTML = '';
+            
+            if (horses.length === 0) {
+                horsesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-horse"></i>
+                        </div>
+                        <h3>Пока нет коней</h3>
+                        <p>Администратор скоро добавит карточки героев</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            horses.forEach(horse => {
+                const horseCard = document.createElement('div');
+                horseCard.className = 'card';
+                horseCard.onclick = () => openHorseModal(horse.id);
+                
+                horseCard.innerHTML = `
+                    <div class="card-header">
+                        <h3 class="card-title">${horse.name}</h3>
+                        <div class="card-index">Индекс: ${horse.index}</div>
+                    </div>
+                    <img src="${horse.photo || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'}" alt="${horse.name}" class="card-img">
+                    <div class="card-body">
+                        <p class="card-text">${horse.description.substring(0, 100)}${horse.description.length > 100 ? '...' : ''}</p>
+                        <div class="horse-stats">
+                            <div class="horse-stat">
+                                <div class="stat-value">${Math.round(horse.food)}%</div>
+                                <div class="stat-label">Еда</div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill food-fill" style="width: ${horse.food}%"></div>
+                                </div>
+                            </div>
+                            <div class="horse-stat">
+                                <div class="stat-value">${Math.round(horse.water)}%</div>
+                                <div class="stat-label">Вода</div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill water-fill" style="width: ${horse.water}%"></div>
+                                </div>
+                            </div>
+                            <div class="horse-stat">
+                                <div class="stat-value">${Math.round(horse.happiness)}%</div>
+                                <div class="stat-label">Настроение</div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill happiness-fill" style="width: ${horse.happiness}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-info btn-small" onclick="event.stopPropagation(); openHorseModal(${horse.id})">
+                                <i class="fas fa-expand"></i> Подробнее
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                horsesList.appendChild(horseCard);
+            });
+        }
+
+        // Функция для загрузки списка коней в админ-панели
+        function loadHorsesAdmin() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            const horsesAdminList = document.getElementById('horses-admin-list');
+            horsesAdminList.innerHTML = '';
+            
+            if (horses.length === 0) {
+                horsesAdminList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-horse"></i>
+                        </div>
+                        <h3>Пока нет коней</h3>
+                        <p>Добавьте первого коня с помощью формы выше</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            horses.forEach(horse => {
+                const horseItem = document.createElement('div');
+                horseItem.className = 'horse-item';
+                
+                horseItem.innerHTML = `
+                    <div class="horse-info">
+                        <div class="horse-name">${horse.name}</div>
+                        <div class="horse-index">Индекс: ${horse.index}</div>
+                    </div>
+                    <div class="horse-actions">
+                        <button class="btn btn-danger btn-small" onclick="deleteHorse(${horse.id})">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    </div>
+                `;
+                
+                horsesAdminList.appendChild(horseItem);
+            });
+        }
+
+        document.getElementById('add-horse-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                showNotification('Только администраторы могут добавлять коней', 'error');
+                return;
+            }
+            
+            const name = document.getElementById('horse-name').value;
+            const index = document.getElementById('horse-index').value;
+            const description = document.getElementById('horse-description').value;
+            const photoInput = document.getElementById('horse-photo');
+            
+            // Проверка, существует ли конь с таким индексом
+            if (horses.find(horse => horse.index === index)) {
+                showNotification('Конь с таким индексом уже существует', 'error');
+                return;
+            }
+            
+            // Обработка загрузки фото
+            let photoUrl = '';
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoUrl = e.target.result;
+                    addHorseToDatabase(name, index, description, photoUrl);
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                addHorseToDatabase(name, index, description, photoUrl);
+            }
+        });
+
+        function addHorseToDatabase(name, index, description, photoUrl) {
+            const newHorse = {
+                id: horses.length > 0 ? Math.max(...horses.map(h => h.id)) + 1 : 1,
+                name,
+                index,
+                description,
+                photo: photoUrl,
+                food: 100,
+                water: 100,
+                happiness: 100,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            horses.push(newHorse);
+            localStorage.setItem('horses', JSON.stringify(horses));
+            
+            showNotification(`Конь ${name} успешно добавлен!`, 'success');
+            document.getElementById('add-horse-form').reset();
+            document.querySelector('.photo-preview').innerHTML = '<span>Предпросмотр фото</span>';
+            loadHorses();
+            loadHorsesAdmin();
+        }
+
+        // Функция для удаления коня
+        function deleteHorse(horseId) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showNotification('Только администраторы могут удалять коней', 'error');
+                return;
+            }
+            
+            const horse = horses.find(h => h.id === horseId);
+            if (!horse) return;
+            
+            if (confirm(`Вы уверены, что хотите удалить коня "${horse.name}"? Это действие нельзя отменить.`)) {
+                // Удаляем коня из массива
+                horses = horses.filter(h => h.id !== horseId);
+                localStorage.setItem('horses', JSON.stringify(horses));
+                
+                showNotification(`Конь ${horse.name} был удален`, 'success');
+                
+                // Закрываем модальное окно, если оно открыто для этого коня
+                if (currentHorseId === horseId) {
+                    closeHorseModal();
+                }
+                
+                // Обновляем списки
+                loadHorses();
+                loadHorsesAdmin();
+            }
+        }
+
+        // Функции для модального окна
+        function openHorseModal(horseId) {
+            const horse = horses.find(h => h.id === horseId);
+            if (!horse) return;
+            
+            currentHorseId = horseId;
+            
+            // Заполняем модальное окно данными коня
+            document.getElementById('modal-horse-name').textContent = horse.name;
+            document.getElementById('modal-horse-index').textContent = `Индекс: ${horse.index}`;
+            document.getElementById('modal-horse-photo').src = horse.photo || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60';
+            document.getElementById('modal-horse-description').textContent = horse.description;
+            
+            // Показываем кнопку удаления только для администраторов
+            const deleteBtn = document.getElementById('modal-delete-btn');
+            if (currentUser && currentUser.role === 'admin') {
+                deleteBtn.style.display = 'block';
+            } else {
+                deleteBtn.style.display = 'none';
+            }
+            
+            // Обновляем показатели
+            updateModalStats(horse);
+            
+            // Показываем модальное окно
+            document.getElementById('horse-modal').style.display = 'block';
+        }
+        
+        function closeHorseModal() {
+            document.getElementById('horse-modal').style.display = 'none';
+            currentHorseId = null;
+        }
+        
+        function updateModalStats(horse) {
+            // Обновляем значения
+            document.getElementById('modal-horse-food').textContent = `${Math.round(horse.food)}%`;
+            document.getElementById('modal-horse-water').textContent = `${Math.round(horse.water)}%`;
+            document.getElementById('modal-horse-happiness').textContent = `${Math.round(horse.happiness)}%`;
+            
+            // Добавляем показатель энергии (вычисляем как среднее от еды и воды)
+            const energy = Math.round((horse.food + horse.water) / 2);
+            document.getElementById('modal-horse-energy').textContent = `${energy}%`;
+            
+            // Обновляем прогресс-бары
+            document.getElementById('modal-horse-food-bar').style.width = `${horse.food}%`;
+            document.getElementById('modal-horse-water-bar').style.width = `${horse.water}%`;
+            document.getElementById('modal-horse-happiness-bar').style.width = `${horse.happiness}%`;
+            document.getElementById('modal-horse-energy-bar').style.width = `${energy}%`;
+        }
+
+        // Функции для ухода за лошадьми
+        function feedHorse(horseId) {
+            if (!currentUser) {
+                showNotification('Войдите, чтобы ухаживать за конем', 'error');
+                return;
+            }
+            
+            const horse = horses.find(h => h.id === horseId);
+            if (horse) {
+                horse.food = Math.min(100, horse.food + 20);
+                horse.happiness = Math.min(100, horse.happiness + 5);
+                horse.lastUpdated = new Date().toISOString();
+                updateHorseStats(horse);
+                
+                // Если модальное окно открыто для этого коня, обновляем его
+                if (currentHorseId === horseId) {
+                    updateModalStats(horse);
+                }
+                
+                showNotification(`Вы покормили ${horse.name}!`, 'success');
+            }
+        }
+
+        function waterHorse(horseId) {
+            if (!currentUser) {
+                showNotification('Войдите, чтобы ухаживать за конем', 'error');
+                return;
+            }
+            
+            const horse = horses.find(h => h.id === horseId);
+            if (horse) {
+                horse.water = Math.min(100, horse.water + 25);
+                horse.happiness = Math.min(100, horse.happiness + 3);
+                horse.lastUpdated = new Date().toISOString();
+                updateHorseStats(horse);
+                
+                // Если модальное окно открыто для этого коня, обновляем его
+                if (currentHorseId === horseId) {
+                    updateModalStats(horse);
+                }
+                
+                showNotification(`Вы напоили ${horse.name}!`, 'success');
+            }
+        }
+
+        function playWithHorse(horseId) {
+            if (!currentUser) {
+                showNotification('Войдите, чтобы ухаживать за конем', 'error');
+                return;
+            }
+            
+            const horse = horses.find(h => h.id === horseId);
+            if (horse) {
+                horse.happiness = Math.min(100, horse.happiness + 15);
+                horse.food = Math.max(0, horse.food - 5);
+                horse.water = Math.max(0, horse.water - 5);
+                horse.lastUpdated = new Date().toISOString();
+                updateHorseStats(horse);
+                
+                // Если модальное окно открыто для этого коня, обновляем его
+                if (currentHorseId === horseId) {
+                    updateModalStats(horse);
+                }
+                
+                showNotification(`Вы поиграли с ${horse.name}!`, 'success');
+            }
+        }
+        
+        // Новая функция для отдыха
+        function restHorse(horseId) {
+            if (!currentUser) {
+                showNotification('Войдите, чтобы ухаживать за конем', 'error');
+                return;
+            }
+            
+            const horse = horses.find(h => h.id === horseId);
+            if (horse) {
+                horse.happiness = Math.min(100, horse.happiness + 10);
+                horse.food = Math.max(0, horse.food - 3);
+                horse.water = Math.max(0, horse.water - 3);
+                horse.lastUpdated = new Date().toISOString();
+                updateHorseStats(horse);
+                
+                // Если модальное окно открыто для этого коня, обновляем его
+                if (currentHorseId === horseId) {
+                    updateModalStats(horse);
+                }
+                
+                showNotification(`${horse.name} отдохнул!`, 'success');
+            }
+        }
+
+        function updateHorseStats(horse) {
+            localStorage.setItem('horses', JSON.stringify(horses));
+            loadHorses();
+        }
+
+        // Функции для админ-панели
+        function loadUsers() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            const usersList = document.getElementById('users-list');
+            usersList.innerHTML = '';
+            
+            users.forEach(user => {
+                if (user.username === mainAdmin.username) return; // Пропускаем главного админа
+                
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                userItem.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-email">${user.email}</div>
+                    </div>
+                    <div class="user-actions">
+                        <span class="user-role ${user.role === 'admin' ? 'role-admin' : 'role-user'}">
+                            ${user.role === 'admin' ? 'Администратор' : 'Пользователь'}
+                        </span>
+                        ${user.role !== 'admin' ? 
+                            `<button class="btn btn-success btn-small" onclick="makeAdmin('${user.username}')">
+                                <i class="fas fa-user-shield"></i> Сделать админом
+                            </button>` : 
+                            `<button class="btn btn-danger btn-small" onclick="removeAdmin('${user.username}')">
+                                <i class="fas fa-user-times"></i> Убрать админку
+                            </button>`
+                        }
+                    </div>
+                `;
+                
+                usersList.appendChild(userItem);
+            });
+        }
+
+        function makeAdmin(username) {
+            if (!currentUser || currentUser.username !== mainAdmin.username) {
+                showNotification('Только главный администратор может назначать администраторов', 'error');
+                return;
+            }
+            
+            const user = users.find(u => u.username === username);
+            if (user) {
+                user.role = 'admin';
+                localStorage.setItem('users', JSON.stringify(users));
+                showNotification(`Пользователь ${username} теперь администратор`, 'success');
+                loadUsers();
+            }
+        }
+
+        function removeAdmin(username) {
+            if (!currentUser || currentUser.username !== mainAdmin.username) {
+                showNotification('Только главный администратор может снимать права администратора', 'error');
+                return;
+            }
+            
+            const user = users.find(u => u.username === username);
+            if (user) {
+                user.role = 'user';
+                localStorage.setItem('users', JSON.stringify(users));
+                showNotification(`Пользователь ${username} больше не администратор`, 'success');
+                loadUsers();
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Убедимся, что главный администратор всегда в системе
+            const adminExists = users.some(user => user.username === 'admin');
+            if (!adminExists) {
+                users.push(mainAdmin);
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // Обновляем показатели при загрузке страницы
+            updateStatsInRealTime();
+            
+            updateUI();
+            setupJoinButton();
+            loadHorses();
+            if (currentUser && currentUser.role === 'admin') {
+                loadUsers();
+                loadHorsesAdmin();
+            }
+            
+            // Установка интервала для обновления показателей каждую минуту
+            setInterval(updateStatsInRealTime, 60 * 1000); // 1 минута в миллисекундах
+            
+            // Обработчик загрузки фото
+            document.getElementById('horse-photo').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.querySelector('.photo-preview');
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Предпросмотр">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Закрытие модального окна при клике вне его
+            window.onclick = function(event) {
+                const modal = document.getElementById('horse-modal');
+                if (event.target === modal) {
+                    closeHorseModal();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
